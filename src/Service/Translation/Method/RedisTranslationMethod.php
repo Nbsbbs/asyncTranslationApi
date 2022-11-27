@@ -33,7 +33,6 @@ class RedisTranslationMethod implements TranslationMethodInterface
      */
     public function withNext(TranslationMethodInterface $next): self
     {
-        var_dump('www');
         $this->next = $next;
         return $this;
     }
