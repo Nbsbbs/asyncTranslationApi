@@ -24,6 +24,11 @@ class App
     public static Router $router;
 
     /**
+     * @var string
+     */
+    public static string $listen = '127.0.0.1:8001';
+
+    /**
      * @var int
      */
     public static int $execTime = self::DEFAULT_EXECUTION_TIME;

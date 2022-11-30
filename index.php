@@ -9,7 +9,7 @@ use React\Http\HttpServer;
 use React\Socket\SocketServer;
 
 $server = new HttpServer(App::router());
-$socket = new SocketServer('213.152.172.178:8001');
+$socket = new SocketServer(App::$listen);
 $startTimestamp = microtime(true);
 
 App::get(LoggerInterface::class)->warning('Started');
