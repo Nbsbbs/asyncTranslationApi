@@ -11,13 +11,11 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use React\Promise\PromiseInterface;
 
-class RedisTranslationMethod implements TranslationMethodInterface
+class RedisBasicTranslator implements BasicTranslatorInterface
 {
     public const SOURCE_ID = 'redis';
 
     private Client $redis;
-
-    private ?TranslationMethodInterface $next = null;
 
     /**
      * @param Client $redis
@@ -28,16 +26,6 @@ class RedisTranslationMethod implements TranslationMethodInterface
     }
 
     /**
-     * @param TranslationMethodInterface $next
-     * @return $this
-     */
-    public function withNext(TranslationMethodInterface $next): self
-    {
-        $this->next = $next;
-        return $this;
-    }
-
-    /**
      * @param Request $request
      * @return PromiseInterface
      * @throws ContainerExceptionInterface
@@ -45,16 +33,15 @@ class RedisTranslationMethod implements TranslationMethodInterface
      */
     public function translate(Request $request): PromiseInterface
     {
+        App::logger()->debug('Request ' . $request->getLanguage() . ':' . $request->getQuery() . ', method ' . __CLASS__);
         return $this->redis->HGET($this->key($request->getLanguage(), $request->getQuery()), md5($request->getQuery()))->then(
             function ($value) use ($request) {
+                App::logger()->debug('Got value ' . $value . ' in ' . __CLASS__);
                 if (!empty($value)) {
+                    App::logger()->debug('Returning ok ' . ($value) . ' in ' . __CLASS__);
                     return (new Response($request, $value))->withSource(self::SOURCE_ID);
                 } else {
-                    if (is_null($this->next)) {
-                        return new Response($request);
-                    } else {
-                        return $this->next->translate($request);
-                    }
+                    return new Response($request);
                 }
             },
             function ($error) {

@@ -9,11 +9,9 @@ use Psr\Log\LoggerInterface;
 use React\MySQL\ConnectionInterface;
 use React\Promise\PromiseInterface;
 
-class LastResortTranslationMethod implements TranslationMethodInterface
+class LastResortBasicTranslator implements BasicTranslatorInterface
 {
     private ConnectionInterface $connection;
-
-    private TranslationMethodInterface $next;
 
     /**
      * @param ConnectionInterface $connection
@@ -29,6 +27,7 @@ class LastResortTranslationMethod implements TranslationMethodInterface
      */
     public function translate(Request $request): PromiseInterface
     {
+        App::logger()->debug('Request ' . $request->getLanguage() . ':' . $request->getQuery() . ', method ' . __CLASS__);
         // just log
         return $this->connection->query('INSERT INTO need_translation (lang_code, query) VALUES (?, ?) ON DUPLICATE KEY UPDATE query_count=query_count+1',
             [$request->getLanguage(), $request->getQuery()])->then(
@@ -37,15 +36,5 @@ class LastResortTranslationMethod implements TranslationMethodInterface
                 return new Response($request);
             }
         );
-    }
-
-    /**
-     * @param TranslationMethodInterface $next
-     * @return TranslationMethodInterface
-     */
-    public function withNext(TranslationMethodInterface $next): TranslationMethodInterface
-    {
-        $this->next = $next;
-        return $this;
     }
 }

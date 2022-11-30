@@ -11,4 +11,4 @@ $routes = new RouteCollector(new Std(), new GroupCountBased());
 $routes->get('/info', new Info());
 $routes->post('/info', new Info());
 
-App::$router = new Router($routes);
+return new Router($routes);

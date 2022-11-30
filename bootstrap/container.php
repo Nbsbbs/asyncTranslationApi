@@ -1,9 +1,10 @@
 <?php
 
-use App\App;
-use App\Service\Translation\Method\LastResortTranslationMethod;
-use App\Service\Translation\Method\MysqlTranslationMethod;
-use App\Service\Translation\Method\RedisTranslationMethod;
+use App\Service\Translation\ChainTranslator;
+use App\Service\Translation\Method\LastResortBasicTranslator;
+use App\Service\Translation\Method\MysqlBasicTranslator;
+use App\Service\Translation\Method\RedisBasicTranslator;
+use App\Service\Translation\Storage\MysqlStorage;
 use Clue\React\Redis\Client as RedisClient;
 use DI\ContainerBuilder;
 use EspressoByte\LoopUtil\FileLogger\Monolog\FileHandler;
@@ -28,11 +29,13 @@ $builder->addDefinitions([
         $url = 'redis+unix://' . $_ENV['REDIS_HOST'] . '?db=' . $_ENV['REDIS_DB'];
         return $factory->createLazyClient($url);
     },
-    MysqlTranslationMethod::class => function (ContainerInterface $c) {
-        return (new MysqlTranslationMethod($c->get(ConnectionInterface::class)))->withNext($c->get(LastResortTranslationMethod::class));
-    },
-    RedisTranslationMethod::class => function (ContainerInterface $c) {
-        return (new RedisTranslationMethod($c->get(RedisClient::class)))->withNext($c->get(MysqlTranslationMethod::class));
+    ChainTranslator::class => function (ContainerInterface $c) {
+        $methods = [];
+        $methods[] = new RedisBasicTranslator($c->get(RedisClient::class));
+        $methods[] = new MysqlBasicTranslator($c->get(ConnectionInterface::class));
+        $methods[] = new LastResortBasicTranslator($c->get(ConnectionInterface::class));
+
+        return new ChainTranslator($methods, $c->get(MysqlStorage::class));
     },
     LoggerInterface::class => function (ContainerInterface $c) {
         $logger = new Logger('translate');
@@ -43,4 +46,4 @@ $builder->addDefinitions([
 
 $container = $builder->build();
 
-App::$container = $container;
+return $container;

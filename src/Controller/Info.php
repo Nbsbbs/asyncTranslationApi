@@ -3,10 +3,9 @@
 namespace App\Controller;
 
 use App\App;
-use App\Service\Translation\Method\RedisTranslationMethod;
+use App\Service\Translation\ChainTranslator;
 use App\Service\Translation\Request;
 use App\Service\Translation\Response as TranslationResponse;
-use App\Service\Translation\Translator;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use React\Http\Message\Response;
@@ -28,7 +27,10 @@ class Info
                 $translationRequest->addMetaData('user-agent', $parsed['param1']);
             }
 
-            $translator = new Translator(App::get(RedisTranslationMethod::class));
+            /**
+             * @var ChainTranslator $translator
+             */
+            $translator = App::get(ChainTranslator::class);
 
             return $translator->translate($translationRequest)->then(
                 function (TranslationResponse $response) use ($request, $translationRequest) {

@@ -2,6 +2,8 @@
 
 namespace App\Service\Translation;
 
+use App\Service\Translation\Query\Normalizer;
+
 class Response
 {
     /**
@@ -31,7 +33,9 @@ class Response
     public function __construct(Request $request, ?string $translated = null)
     {
         $this->request = $request;
-        $this->translated = $translated;
+        if (!is_null($translated)) {
+            $this->translated = Normalizer::normalize($translated);
+        }
     }
 
     /**

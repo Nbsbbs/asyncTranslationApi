@@ -2,6 +2,7 @@
 
 namespace App\Service\Translation;
 
+use App\Service\Translation\Query\Normalizer;
 use Nbsbbs\Common\Language\LanguageFactory;
 
 class Request
@@ -34,7 +35,7 @@ class Request
     {
         $this->validateLanguageCode($langCode);
         $this->validateLanguageCode($targetLangCode);
-        $normalized = $this->normalizeQuery($query);
+        $normalized = Normalizer::normalize($query);
         $this->validateQuery($normalized);
         $this->langCode = $langCode;
         $this->targetLangCode = $targetLangCode;
@@ -97,22 +98,6 @@ class Request
     public function __toString(): string
     {
         return sprintf('Translation from "%s" to "%s", query "%s"', $this->langCode, $this->targetLangCode, $this->query);
-    }
-
-    /**
-     * @param string $query
-     * @return string
-     */
-    protected function normalizeQuery(string $query): string
-    {
-        $text = mb_convert_case($query, MB_CASE_LOWER, "UTF-8");
-        $text = preg_replace("#\s+#s", " ", $text);
-        $text = preg_replace("#([\d\s]+)$#s", "", $text);
-        $text = trim($text);
-        $words = explode(' ', $text);
-        $words = array_unique($words);
-        $text = implode(' ', $words);
-        return $text;
     }
 
     /**
