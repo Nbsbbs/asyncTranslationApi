@@ -11,7 +11,7 @@ use Throwable;
 
 class App
 {
-    public const DEFAULT_EXECUTION_TIME = 10;
+    public const DEFAULT_EXECUTION_TIME = 3600;
 
     /**
      * @var ContainerInterface

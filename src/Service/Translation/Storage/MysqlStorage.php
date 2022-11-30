@@ -3,6 +3,7 @@
 namespace App\Service\Translation\Storage;
 
 use App\App;
+use App\Service\Translation\Method\ParalinkTranslationMethod;
 use App\Service\Translation\Response;
 use DateTimeImmutable;
 use React\MySQL\ConnectionInterface;
@@ -13,7 +14,7 @@ class MysqlStorage implements StorageInterface
 {
     private const TABLE = 'translated_phrases';
     private const SAVE_SOURCES = [
-        'paralink',
+        ParalinkTranslationMethod::SOURCE_ID,
     ];
 
     /**

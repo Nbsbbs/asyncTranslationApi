@@ -9,9 +9,9 @@ use React\MySQL\ConnectionInterface;
 use React\MySQL\QueryResult;
 use React\Promise\PromiseInterface;
 
-class MysqlBasicTranslator implements BasicTranslatorInterface
+class MysqlParalinkTranslator implements BasicTranslatorInterface
 {
-    public const SOURCE_ID = 'mysql';
+    public const SOURCE_ID = 'mysql-paralink';
 
     private ConnectionInterface $connection;
 
@@ -31,13 +31,11 @@ class MysqlBasicTranslator implements BasicTranslatorInterface
     {
         App::logger()->debug('Request ' . $request->getLanguage() . ':' . $request->getQuery() . ', method ' . __CLASS__);
         $data = [
-            $request->hash(),
             $request->getLanguage(),
             $request->getTargetLanguage(),
             $request->getQuery(),
         ];
-
-        return $this->connection->query('SELECT * FROM translation_cache where md5_hash=? and lang_from=? and lang_to=? and text_from=?', $data)->then(
+        return $this->connection->query('SELECT * FROM translated_phrases where lang_from=? and lang_to=? and text_from=?', $data)->then(
             function (QueryResult $result) use ($request) {
                 if ($result->resultRows) {
                     $row = array_shift($result->resultRows);

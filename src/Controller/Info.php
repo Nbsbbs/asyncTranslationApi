@@ -36,12 +36,24 @@ class Info
                 function (TranslationResponse $response) use ($request, $translationRequest) {
                     App::get(LoggerInterface::class)->info($translationRequest . ' => ' . $response->getTranslated());
                     if ($response->isOk()) {
-                        return new Response(200, ['Content-type' => 'application/json'], json_encode(['version' => self::VERSION, 'response' => $response->getTranslated(), 'request' => $request->getParsedBody()]));
+                        return new Response(200, ['Content-type' => 'application/json'], json_encode([
+                            'version' => self::VERSION,
+                            'response' => $response->getTranslated(),
+                            'source' => $response->getSource(),
+                            'request' => $request->getParsedBody(),
+                        ]));
                     } else {
                         if ($response->isError()) {
-                            return new Response(400, ['Content-type' => 'application/json'], json_encode(['version' => self::VERSION, 'error' => $response->getError(), 'request' => $request->getParsedBody()]));
+                            return new Response(400, ['Content-type' => 'application/json'], json_encode([
+                                'version' => self::VERSION,
+                                'error' => $response->getError(),
+                                'request' => $request->getParsedBody(),
+                            ]));
                         } else {
-                            return new Response(404, ['Content-type' => 'application/json'], json_encode(['version' => self::VERSION, 'request' => $request->getParsedBody()]));
+                            return new Response(404, ['Content-type' => 'application/json'], json_encode([
+                                'version' => self::VERSION,
+                                'request' => $request->getParsedBody(),
+                            ]));
                         }
                     }
                 },

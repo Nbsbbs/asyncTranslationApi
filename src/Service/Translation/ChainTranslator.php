@@ -82,7 +82,6 @@ class ChainTranslator
      */
     protected function storeResponse(Response $response): PromiseInterface
     {
-        App::logger()->debug('Trying to store response: ' . $response->getTranslated());
         return $this->storage->store($response);
     }
 

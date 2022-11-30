@@ -3,6 +3,8 @@
 use App\Service\Translation\ChainTranslator;
 use App\Service\Translation\Method\LastResortBasicTranslator;
 use App\Service\Translation\Method\MysqlBasicTranslator;
+use App\Service\Translation\Method\MysqlParalinkTranslator;
+use App\Service\Translation\Method\ParalinkTranslationMethod;
 use App\Service\Translation\Method\RedisBasicTranslator;
 use App\Service\Translation\Storage\MysqlStorage;
 use Clue\React\Redis\Client as RedisClient;
@@ -32,7 +34,9 @@ $builder->addDefinitions([
     ChainTranslator::class => function (ContainerInterface $c) {
         $methods = [];
         $methods[] = new RedisBasicTranslator($c->get(RedisClient::class));
+        $methods[] = $c->get(MysqlParalinkTranslator::class);
         $methods[] = new MysqlBasicTranslator($c->get(ConnectionInterface::class));
+        $methods[] = $c->get(ParalinkTranslationMethod::class);
         $methods[] = new LastResortBasicTranslator($c->get(ConnectionInterface::class));
 
         return new ChainTranslator($methods, $c->get(MysqlStorage::class));

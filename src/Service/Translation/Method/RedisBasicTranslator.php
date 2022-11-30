@@ -39,10 +39,11 @@ class RedisBasicTranslator implements BasicTranslatorInterface
                 App::logger()->debug('Got value ' . $value . ' in ' . __CLASS__);
                 if (!empty($value)) {
                     App::logger()->debug('Returning ok ' . ($value) . ' in ' . __CLASS__);
-                    return (new Response($request, $value))->withSource(self::SOURCE_ID);
+                    $response = (new Response($request, $value));
                 } else {
-                    return new Response($request);
+                    $response = new Response($request);
                 }
+                return $response->withSource(self::SOURCE_ID);
             },
             function ($error) {
                 App::get(LoggerInterface::class)->error($error->getMessage());
