@@ -36,7 +36,7 @@ class MysqlStorage implements StorageInterface
      */
     public function store(Response $response): PromiseInterface
     {
-        if ($this->isNeedStore($response)) {
+        if ($this->isNeedStore($response) and $this->canStore($response)) {
             return $this->connection->query(
                 'INSERT IGNORE INTO ' . self::TABLE . ' (`lang_from`, `text_from`, `lang_to`, `text_to`, `source`, `date_time`) VALUES (?, ?, ?, ? ,?, ?)',
                 [
@@ -69,6 +69,24 @@ class MysqlStorage implements StorageInterface
     protected function isNeedStore(Response $response): bool
     {
         return in_array($response->getSource(), self::SAVE_SOURCES);
+    }
+
+    /**
+     * @param Response $response
+     * @return bool
+     */
+    protected function canStore(Response $response): bool
+    {
+        if (is_null($response->getTranslated())) {
+            return false;
+        }
+        if (strlen($response->getTranslated() < 1)) {
+            return false;
+        }
+        if ($response->getTranslated() === $response->getRequest()->getQuery()) {
+            return false;
+        }
+        return true;
     }
 
     /**

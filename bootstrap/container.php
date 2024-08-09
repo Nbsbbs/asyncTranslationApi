@@ -43,7 +43,7 @@ $builder->addDefinitions([
     },
     LoggerInterface::class => function (ContainerInterface $c) {
         $logger = new Logger('translate');
-        $logger->pushHandler(new FileHandler(Loop::get(), $_ENV['LOG_DIR'] . '/system.log'));
+        $logger->pushHandler(new FileHandler(Loop::get(), $_ENV['LOG_DIR'] . '/system.log', Logger::NOTICE));
         return $logger;
     },
 ]);

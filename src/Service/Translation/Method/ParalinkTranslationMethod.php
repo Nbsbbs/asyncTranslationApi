@@ -2,6 +2,7 @@
 
 namespace App\Service\Translation\Method;
 
+use App\App;
 use App\Service\Translation\Request;
 use App\Service\Translation\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -52,7 +53,10 @@ class ParalinkTranslationMethod implements BasicTranslatorInterface
                 $parsed = $this->parseResponse($response->getBody()->getContents());
                 if (!is_null($parsed)) {
                     $result = new Response($request, $parsed);
+                    App::logger()->debug('Good response from paralink: '.$response->getStatusCode());
+                    App::logger()->notice('Translation from paralink: '.$request->getQuery().'] => ['.($result->getTranslated() ?? '').'] ['.$request->getLanguage().']');
                 } else {
+                    App::logger()->debug('Null response from paralink: '.$response->getStatusCode());
                     $result = new Response($request);
                 }
                 return $result->withSource(self::SOURCE_ID);

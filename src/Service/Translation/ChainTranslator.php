@@ -52,10 +52,10 @@ class ChainTranslator
                 function (Response $response) use ($method) {
                     App::logger()->debug('Got response: ' . ($response->isOk() ? 'ok' : 'no') . ' from ' . $response->getSource());
                     if (!$response->isOk()) {
-                        App::logger()->info('Chaining translation to method ' . get_class($method) . ' because ' . $response->isOk() . ', ' . $response->getTranslated());
+                        App::logger()->debug('Chaining translation to method ' . get_class($method) . ' because ' . $response->isOk() . ', ' . $response->getTranslated());
                         return $method->translate($response->getRequest());
                     } else {
-                        App::logger()->info('Found translation in ' . $response->getSource() . ' current ' . get_class($method));
+                        App::logger()->debug('Found translation in ' . $response->getSource() . ' current ' . get_class($method));
                         return $response;
                     }
                 }
